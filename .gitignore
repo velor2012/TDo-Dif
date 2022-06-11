@@ -1,0 +1,16 @@
+log*.txt
+.png
+/.vscode
+/other
+/results
+/log*
+/GLUnet
+/*save_path
+/script
+/datasets/*
+/checkpoints/*
+!/datasets/*.py
+!/checkpoints/README.md
+/log_TIP
+/log_ACDC
+*.zip
