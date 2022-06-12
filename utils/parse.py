@@ -49,11 +49,11 @@ def get_argparser():
     parser.add_argument("--source_data_root", type=str, default='~/SyntheticCityScapes',
                         help="path to Dataset")
     parser.add_argument("--source_dataset", type=str, default='SyntheticCityscapes',
-                        choices=['voc', 'cityscapes','FoggyDriving','FoggyZurich','SyntheticCityscapes', 'ACDC'], help='Name of dataset')
+                        choices=['voc', 'cityscapes','FoggyDriving','FoggyZurich','SyntheticCityscapes'], help='Name of dataset')
     parser.add_argument("--target_data_root", type=str, default='~/Foggy_Zurich',
                         help="path to Dataset")
     parser.add_argument("--target_dataset", type=str, default='FoggyZurich',
-                        choices=['voc', 'cityscapes','FoggyDriving','FoggyZurich','SyntheticCityscapes','SyntheticCityscapesAll', 'ACDC'], help='Name of dataset')
+                        choices=['voc', 'cityscapes','FoggyDriving','FoggyZurich','SyntheticCityscapes','SyntheticCityscapesAll'], help='Name of dataset')
     parser.add_argument("--num_classes", type=int, default=None,
                         help="num classes (default: None)")
 
@@ -79,10 +79,6 @@ def get_argparser():
                         choices=['light',  'medium'], help='train dataset type, including \'light\' and \'meidum\'')
     parser.add_argument("--light_pseudo_label_path", type=str, default='',help='only useful when train dataset type set \'medium\'')
     parser.add_argument("--use_teacher", action='store_true', default=False)
-    parser.add_argument("--weight", action='store_true', default=False)
-    parser.add_argument("--temper_scaling", action='store_true', default=False)
-    parser.add_argument("--refine_lb", action='store_true', default=False)
-    parser.add_argument("--soft_label", action='store_true', default=False)
     parser.add_argument("--net_momentum",type=float, default=0.99)
     # parser.add_argument("--moco_queue",type=int, default=100, help='queue size for each class, default 100')
     parser.add_argument("--low_dim",type=int, default=128, help='feature dimension for constract learning, default 100')
