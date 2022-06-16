@@ -2,7 +2,7 @@
 
 ![idea.png](ReadmeImg/idea.png)
 
-This is a [PyTorch](http://pytorch.org/) implementation of CanDA
+This is a [PyTorch](http://pytorch.org/) implementation of TDo-Dif
 
 [English](./README.md) | 中文
 
@@ -89,7 +89,7 @@ This is a [PyTorch](http://pytorch.org/) implementation of CanDA
 python main.py --source_dataset cityscapes --source_data_root your_citiscapes_dataset_path --target_dataset FoggyDriving|FoggyZurich --target_data_root your_target_dataset_path  --gpu_id 0 --batch_size 1 --val_batch_size 1 --ckpt checkpoints/xxx.pth --save_val_results --model refineNet --test_only --usegpu
 ```
 
-## 训练CanDA
+## 训练
 
 下载相应数据集，以及模型，然后运行一下代码
 

@@ -2,7 +2,7 @@
 
 ![idea.png](ReadmeImg/idea.png)
 
-This is a [PyTorch](http://pytorch.org/) implementation of CanDA
+This is a [PyTorch](http://pytorch.org/) implementation of TDo-Dif
 
 English | [中文](./README_cn.md)
 
