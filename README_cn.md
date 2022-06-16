@@ -76,12 +76,12 @@ This is a [PyTorch](http://pytorch.org/) implementation of CanDA
   ```
 
 
-## 测试CanDA
+## 测试
 
 | Model         | Network   | Dataset       | mIoU  | BaiduYun                                                                                                          |
 |:-------------:|:---------:|:-------------:| ----- | ----------------------------------------------------------------------------------------------------------------- |
 | base model    | RefinNet  | Foggy Zurich  | 40.02 | [link](https://pan.baidu.https://pan.baidu.com/s/1Z0Cl5yAxSqHYwXmzfAxtAgcom/s/1Z0Cl5yAxSqHYwXmzfAxtAg) code: zz6z |
-| TDo-Dif-zurich  | RefinNet  | Foggy Zurich  | 52.18 | [link](https://pan.baidu.com/s/1XhsD27XGmCLEJabbC0CHGw) code: tx32                                                |
+| TDo-Dif-zurich  | RefinNet  | Foggy Zurich  | 51.84 | [link](https://pan.baidu.com/s/1z7VvPp6xztd4bvRuLgzuNg) code: mbb5                                                |
 
 下载好数据集与上表中的模型后，运行下面的代码,注意target_dataset为三选一，target_data_root与source_data_root改为您的数据集的路径,ckpt为您的模型的路径
 

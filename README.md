@@ -79,7 +79,7 @@ There are two installation options you can choose from:
 | Model         | Network   | Dataset       | mIoU  | BaiduYun                                                                                                          |
 |:-------------:|:---------:|:-------------:| ----- | ----------------------------------------------------------------------------------------------------------------- |
 | base model    | RefinNet  | Foggy Zurich  | 40.02 | [link](https://pan.baidu.https://pan.baidu.com/s/1Z0Cl5yAxSqHYwXmzfAxtAgcom/s/1Z0Cl5yAxSqHYwXmzfAxtAg) code: zz6z |
-| TDo-Dif-zurich  | RefinNet  | Foggy Zurich  | 52.18 | [link](https://pan.baidu.com/s/1XhsD27XGmCLEJabbC0CHGw) code: tx32       
+| TDo-Dif-zurich  | RefinNet  | Foggy Zurich  | 51.84 | [link](https://pan.baidu.com/s/1z7VvPp6xztd4bvRuLgzuNg) code: mbb5        
 
 After downloading the dataset and the model in the table above, run the following code, note that target_dataset is one of three choices, **target_data_root** and **source_data_root** are the paths of your dataset, and **ckpt** is the path of your model
 
