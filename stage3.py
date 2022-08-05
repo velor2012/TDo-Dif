@@ -69,8 +69,8 @@ import multiprocessing as mp
 warnings.filterwarnings("ignore")
 class STAGE3():
     def __init__(self,round_idx, args,save_round_eval_path=None):
-        from GLUnet.refine_pseudo import refineSeg
-        self.refineSeg = refineSeg
+        # from GLUnet.refine_pseudo import refineSeg
+        # self.refineSeg = refineSeg
         self.round_idx = round_idx
         self.tgt_portion = args.init_target_portion 
         self.target_portion_step = args.target_portion_step
@@ -239,100 +239,100 @@ class STAGE3():
         avalid_image[avalid_x,avalid_y] = closer_label[c[:,1],c[:,0]]
         return avalid_image
 
-    def label_propagation_ov(self,model,device,loader,dense_flow_path,thresh_hold_path,args):
-        print('###### Start label propagation in round {} ! ######'.format(self.round_idx))
-        start_pl = time.time()
-        cls_thresh = np.load(thresh_hold_path)
-        ## output of deeplab is logits, not probability
-        softmax2d = torch.nn.Softmax2d()
-        with torch.no_grad():
-            #遍历顺序为从近景到远景
-            last_img_path,last_img_name,last_img,last_pred,last_prob = None,None,None,None,None
-            prob,pred,last_plabel,proccessed_pred = None,None,None,None
-            for i, datas in enumerate(tqdm(loader)):
-                if(len(datas)==3):
-                    images,_,sample_names = datas
-                elif(len(datas) == 2):
-                    images,_ = datas
-                else:
-                    print("output shape from dataloader is not correct")
-                    return
-                images = images.to(device, dtype=torch.float32)
-                outputs,_ = model(images)
+    # def label_propagation_ov(self,model,device,loader,dense_flow_path,thresh_hold_path,args):
+    #     print('###### Start label propagation in round {} ! ######'.format(self.round_idx))
+    #     start_pl = time.time()
+    #     cls_thresh = np.load(thresh_hold_path)
+    #     ## output of deeplab is logits, not probability
+    #     softmax2d = torch.nn.Softmax2d()
+    #     with torch.no_grad():
+    #         #遍历顺序为从近景到远景
+    #         last_img_path,last_img_name,last_img,last_pred,last_prob = None,None,None,None,None
+    #         prob,pred,last_plabel,proccessed_pred = None,None,None,None
+    #         for i, datas in enumerate(tqdm(loader)):
+    #             if(len(datas)==3):
+    #                 images,_,sample_names = datas
+    #             elif(len(datas) == 2):
+    #                 images,_ = datas
+    #             else:
+    #                 print("output shape from dataloader is not correct")
+    #                 return
+    #             images = images.to(device, dtype=torch.float32)
+    #             outputs,_ = model(images)
 
-                if self.interp is None:
-                    self.interp = torch.nn.Upsample(size=images.shape[2:], mode='bilinear')
-                outputs_interpolated = softmax2d(self.interp(outputs)).cpu().numpy()
-                for j in range(len(outputs_interpolated)):
-                    pred_prob = outputs_interpolated[j]
-                    sample_base_name = os.path.basename(sample_names[j])
-                    sample_name = sample_base_name[:sample_base_name.rfind('.')]
-                    image = images[j]
-                    image = image.detach().cpu().numpy()
-                    image_d  = (self.denorm(image) * 255).transpose(1, 2, 0).astype(np.uint8)
+    #             if self.interp is None:
+    #                 self.interp = torch.nn.Upsample(size=images.shape[2:], mode='bilinear')
+    #             outputs_interpolated = softmax2d(self.interp(outputs)).cpu().numpy()
+    #             for j in range(len(outputs_interpolated)):
+    #                 pred_prob = outputs_interpolated[j]
+    #                 sample_base_name = os.path.basename(sample_names[j])
+    #                 sample_name = sample_base_name[:sample_base_name.rfind('.')]
+    #                 image = images[j]
+    #                 image = image.detach().cpu().numpy()
+    #                 image_d  = (self.denorm(image) * 255).transpose(1, 2, 0).astype(np.uint8)
                     
-                    weighted_prob = pred_prob.transpose(1,2,0)/cls_thresh
-                    weighted_prob = weighted_prob.transpose(2,0,1)
-                    prob = weighted_prob
-                    weighted_pred_trainIDs = np.asarray(np.argmax(weighted_prob, axis=0), dtype=np.uint8)
+    #                 weighted_prob = pred_prob.transpose(1,2,0)/cls_thresh
+    #                 weighted_prob = weighted_prob.transpose(2,0,1)
+    #                 prob = weighted_prob
+    #                 weighted_pred_trainIDs = np.asarray(np.argmax(weighted_prob, axis=0), dtype=np.uint8)
 
-                    weighted_conf = np.amax(weighted_prob, axis=0)
-                    pred_label_trainIDs = weighted_pred_trainIDs.copy()
-                    pred_label_labelIDs = Cityscapes.train_id_to_id[pred_label_trainIDs]
-                    pred_label_labelIDs[weighted_conf < 1] = 0  # '0' in cityscapes indicates 'unlabaled' for labelIDs
-                    pred_label_trainIDs[weighted_conf < 1] = 255 # '255' in cityscapes indicates 'unlabaled' for trainIDs
+    #                 weighted_conf = np.amax(weighted_prob, axis=0)
+    #                 pred_label_trainIDs = weighted_pred_trainIDs.copy()
+    #                 pred_label_labelIDs = Cityscapes.train_id_to_id[pred_label_trainIDs]
+    #                 pred_label_labelIDs[weighted_conf < 1] = 0  # '0' in cityscapes indicates 'unlabaled' for labelIDs
+    #                 pred_label_trainIDs[weighted_conf < 1] = 255 # '255' in cityscapes indicates 'unlabaled' for trainIDs
                     
 
-                    #generate plabel
-                    plabel = pred_label_trainIDs.copy()
-                    if(last_img_path is not None):
-                        temp_string = sample_name
-                        far_img_id = temp_string[-6:]
-                        temp_string2 = os.path.basename(last_img_path)
-                        temp_string2 = temp_string2.split('.png')[0]
-                        closer_img_id = temp_string2[-6:]
-                        a = int(far_img_id)
-                        b = int(closer_img_id)
-                        c = os.path.basename(temp_string)[:10]
-                        d = os.path.basename(last_img_path)[:10] 
-                        if(a == b - 1 and c == d):
-                            #loding dense coresponding
-                            flow = np.load(os.path.join(dense_flow_path,temp_string + '_2_' + temp_string2+'.npy'))
-                            proccessed_pred,proccessed_conf,proccessed_prob = self.refineSeg(last_img,image_d,last_prob,prob,flow,
-                            plabel,last_plabel,save_color_result_path = '%s/%s_color.png' % (self.save_proccess_label_color_path,sample_name))
+    #                 #generate plabel
+    #                 plabel = pred_label_trainIDs.copy()
+    #                 if(last_img_path is not None):
+    #                     temp_string = sample_name
+    #                     far_img_id = temp_string[-6:]
+    #                     temp_string2 = os.path.basename(last_img_path)
+    #                     temp_string2 = temp_string2.split('.png')[0]
+    #                     closer_img_id = temp_string2[-6:]
+    #                     a = int(far_img_id)
+    #                     b = int(closer_img_id)
+    #                     c = os.path.basename(temp_string)[:10]
+    #                     d = os.path.basename(last_img_path)[:10] 
+    #                     if(a == b - 1 and c == d):
+    #                         #loding dense coresponding
+    #                         flow = np.load(os.path.join(dense_flow_path,temp_string + '_2_' + temp_string2+'.npy'))
+    #                         proccessed_pred,proccessed_conf,proccessed_prob = self.refineSeg(last_img,image_d,last_prob,prob,flow,
+    #                         plabel,last_plabel,save_color_result_path = '%s/%s_color.png' % (self.save_proccess_label_color_path,sample_name))
 
-                    if proccessed_pred is not None:
-                        pred_label_trainIDs = proccessed_pred
-                        pred_label_labelIDs = Cityscapes.train_id_to_id[proccessed_pred]
-                    # #add position prior
-                    # prior_error_mask = None
-                    # if args.useprior:
-                    #     prior_error_mask = np.zeros_like(pred_label_trainIDs,dtype=bool)
-                    #     for k,pmap in self.prior_map.items():
-                    #         a = pred_label_trainIDs == k
-                    #         b = pmap < 25
-                    #         c = a & b
-                    #         prior_error_mask[c] = True
-                    #     pred_label_trainIDs[prior_error_mask] = 255
-                    #     pred_label_labelIDs[prior_error_mask] = 0
+    #                 if proccessed_pred is not None:
+    #                     pred_label_trainIDs = proccessed_pred
+    #                     pred_label_labelIDs = Cityscapes.train_id_to_id[proccessed_pred]
+    #                 # #add position prior
+    #                 # prior_error_mask = None
+    #                 # if args.useprior:
+    #                 #     prior_error_mask = np.zeros_like(pred_label_trainIDs,dtype=bool)
+    #                 #     for k,pmap in self.prior_map.items():
+    #                 #         a = pred_label_trainIDs == k
+    #                 #         b = pmap < 25
+    #                 #         c = a & b
+    #                 #         prior_error_mask[c] = True
+    #                 #     pred_label_trainIDs[prior_error_mask] = 255
+    #                 #     pred_label_labelIDs[prior_error_mask] = 0
                     
-                    # pseudo-labels with labelID
-                    pseudo_label_labelIDs = pred_label_labelIDs.copy()
-                    pseudo_label_trainIDs = pred_label_trainIDs.copy()
-                    # if(args.save_val_results):
-                    #     wpred_label_col = Cityscapes.decode_target(pseudo_label_trainIDs).astype(np.uint8)
-                    #     Image.fromarray(wpred_label_col).save('%s/%s_color.png' % (self.save_proccess_label_color_path,sample_name))
-                    Image.fromarray(pseudo_label_labelIDs.astype(np.uint8)).save('%s/%s.png' % (self.save_proccess_label_path,sample_name))
+    #                 # pseudo-labels with labelID
+    #                 pseudo_label_labelIDs = pred_label_labelIDs.copy()
+    #                 pseudo_label_trainIDs = pred_label_trainIDs.copy()
+    #                 # if(args.save_val_results):
+    #                 #     wpred_label_col = Cityscapes.decode_target(pseudo_label_trainIDs).astype(np.uint8)
+    #                 #     Image.fromarray(wpred_label_col).save('%s/%s_color.png' % (self.save_proccess_label_color_path,sample_name))
+    #                 Image.fromarray(pseudo_label_labelIDs.astype(np.uint8)).save('%s/%s.png' % (self.save_proccess_label_path,sample_name))
                     
-                    last_prob = prob
-                    last_pred = pred
-                    last_plabel = plabel
-                    last_img_name = sample_name
-                    last_img_path = sample_names[j]
-                    last_img = image_d
+    #                 last_prob = prob
+    #                 last_pred = pred
+    #                 last_plabel = plabel
+    #                 last_img_name = sample_name
+    #                 last_img_path = sample_names[j]
+    #                 last_img = image_d
 
-        print('###### Finish label propagation in round {}! Time cost: {:.2f} seconds. ######'.format(self.round_idx,time.time() - start_pl))
-        return 0
+    #     print('###### Finish label propagation in round {}! Time cost: {:.2f} seconds. ######'.format(self.round_idx,time.time() - start_pl))
+    #     return 0
     
     def concat_label(self,save_propagation_label_path,save_superpixel_extend_label_path):
         plabel_se_list = os.listdir(save_superpixel_extend_label_path)

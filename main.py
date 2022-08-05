@@ -359,8 +359,8 @@ def main():
         use_spatial_loss = True
         use_lp_et = True
 
-    # save_round_eval_path = os.path.join(opts.save_result_path,'{}_{}_round_{}_{}_{}'.format(opts.target_dataset.lower(), opts.save_model_prefix, round_idx,opts.train_dataset_type,opts.train_type))
-    save_round_eval_path = 'results/foggyzurich_without_soft_with_refine_round_678_light_CRST_sp_lp'
+    save_round_eval_path = os.path.join(opts.save_result_path,'{}_{}_round_{}_{}_{}'.format(opts.target_dataset.lower(), opts.save_model_prefix, round_idx,opts.train_dataset_type,opts.train_type))
+    # save_round_eval_path = 'results/foggyzurich_without_soft_with_refine_round_678_light_CRST_sp_lp'
     stage1 = STAGE1(round_idx,opts,save_round_eval_path)
     # # NOTE for only debug ↓ use_resume
     if (opts.skip_thresh_gen):
